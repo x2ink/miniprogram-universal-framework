@@ -12,15 +12,12 @@
 	import {
 		onMounted
 	} from 'vue';
-	import store from '@/store/index.js';
+	import {
+		userStore
+	} from '@/stores';
 	import $http from "@/api/index.js"
 	onMounted(() => {
-		$http.user.getChartList().then(res => {
-			console.log(res);
-		})
-		// console.log(store.state.username);
-		// console.log(process.env.NODE_ENV);
-
+		console.log(userStore().token);
 	})
 </script>
 

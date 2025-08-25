@@ -60,6 +60,7 @@
 /* 此方法用于生成穿透样式 */
 /* 定义元素（e），对于伪类，会自动将 e 嵌套在 伪类 底下 */
 /* 定义状态（m） */
+/* 定义状态（m） */
 /* 对于需要需要嵌套在 m 底下的 e，调用这个混合宏，一般在切换整个组件的状态，如切换颜色的时候 */
 /* 状态，生成 is-$state 类名 */
 /**
@@ -185,6 +186,7 @@
 /* video-preview */
 /* img-cropper */
 /* floating-panel */
+/* signature */
 .wot-theme-dark .wd-button.is-info.data-v-d858c170 {
   background: var(--wot-dark-background4, #323233);
   color: var(--wot-dark-color3, rgba(232, 230, 227, 0.8));
@@ -210,10 +212,10 @@
   background: transparent;
 }
 .wd-button.data-v-d858c170 {
+  margin-left: initial;
+  margin-right: initial;
   position: relative;
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
+  display: inline-block;
   outline: none;
   -webkit-appearance: none;
   outline: none;
@@ -244,6 +246,12 @@
 .wd-button.data-v-d858c170::after {
   border: none;
   border-radius: 0;
+}
+.wd-button__content.data-v-d858c170 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
 }
 .wd-button--active.data-v-d858c170:active::before {
   opacity: 0.15;
@@ -298,23 +306,6 @@
   padding: var(--wot-button-medium-padding, 0 16px);
   border-radius: var(--wot-button-medium-radius, 4px);
   font-size: var(--wot-button-medium-fs, var(--wot-fs-content, 14px));
-}
-.wd-button.is-medium.is-primary.data-v-d858c170 {
-  box-shadow: var(--wot-button-medium-box-shadow-size, 0px 2px 4px 0px) var(--wot-button-primary-box-shadow-color, rgba(var(--wot-color-theme, #4d80f0), 0.25));
-}
-.wd-button.is-medium.is-success.data-v-d858c170 {
-  box-shadow: var(--wot-button-medium-box-shadow-size, 0px 2px 4px 0px) var(--wot-button-success-box-shadow-color, rgba(var(--wot-color-success, #34d19d), 0.25));
-}
-.wd-button.is-medium.is-warning.data-v-d858c170 {
-  box-shadow: var(--wot-button-medium-box-shadow-size, 0px 2px 4px 0px) var(--wot-button-warning-box-shadow-color, rgba(var(--wot-color-warning, #f0883a), 0.25));
-}
-.wd-button.is-medium.is-error.data-v-d858c170 {
-  box-shadow: var(--wot-button-medium-box-shadow-size, 0px 2px 4px 0px) var(--wot-button-error-box-shadow-color, rgba(var(--wot-color-danger, #fa4350), 0.25));
-}
-.wd-button.is-medium.is-plain.data-v-d858c170 {
-  box-shadow: none;
-}
-.wd-button.is-medium.is-round.data-v-d858c170 {
   min-width: 120px;
 }
 .wd-button.is-medium.is-round.is-icon.data-v-d858c170 {
@@ -337,18 +328,6 @@
 }
 .wd-button.is-large.data-v-d858c170::after {
   border-radius: var(--wot-button-large-radius, 8px);
-}
-.wd-button.is-large:not(.is-plain).is-primary.data-v-d858c170 {
-  box-shadow: var(--wot-button-large-box-shadow-size, 0px 4px 8px 0px) var(--wot-button-primary-box-shadow-color, rgba(var(--wot-color-theme, #4d80f0), 0.25));
-}
-.wd-button.is-large:not(.is-plain).is-success.data-v-d858c170 {
-  box-shadow: var(--wot-button-large-box-shadow-size, 0px 4px 8px 0px) var(--wot-button-success-box-shadow-color, rgba(var(--wot-color-success, #34d19d), 0.25));
-}
-.wd-button.is-large:not(.is-plain).is-warning.data-v-d858c170 {
-  box-shadow: var(--wot-button-large-box-shadow-size, 0px 4px 8px 0px) var(--wot-button-warning-box-shadow-color, rgba(var(--wot-color-warning, #f0883a), 0.25));
-}
-.wd-button.is-large:not(.is-plain).is-error.data-v-d858c170 {
-  box-shadow: var(--wot-button-large-box-shadow-size, 0px 4px 8px 0px) var(--wot-button-error-box-shadow-color, rgba(var(--wot-color-danger, #fa4350), 0.25));
 }
 .wd-button.is-large .wd-button__loading.data-v-d858c170 {
   width: var(--wot-button-large-loading, 24px);
@@ -434,7 +413,7 @@
   border-radius: calc(2 * var(--wot-button-small-radius, 2px));
 }
 .wd-button.is-block.data-v-d858c170 {
-  display: flex;
+  display: block;
 }
 .wd-button.is-icon.data-v-d858c170 {
   width: var(--wot-button-icon-size, 40px);
@@ -456,7 +435,7 @@
 .data-v-d858c170  .wd-button__icon {
   display: block;
   margin-right: 6px;
-  font-size: var(--wot-button-icon-fs, 1.18em);
+  font-size: var(--wot-button-icon-fs, 18px);
   vertical-align: middle;
 }
 .wd-button__text.data-v-d858c170 {

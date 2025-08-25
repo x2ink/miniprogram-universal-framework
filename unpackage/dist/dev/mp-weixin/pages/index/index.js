@@ -1,7 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
-const stores_index = require("../../stores/index.js");
 require("../../utils/request.js");
+const stores_index = require("../../stores/index.js");
 if (!Array) {
   const _easycom_wd_button2 = common_vendor.resolveComponent("wd-button");
   _easycom_wd_button2();
@@ -14,7 +14,8 @@ const _sfc_main = {
   __name: "index",
   setup(__props) {
     common_vendor.onMounted(() => {
-      console.log(stores_index.userStore().token);
+      common_vendor.index.__f__("log", "at pages/index/index.vue:18", stores_index.$store.user.loginStatus);
+      stores_index.$store.user.setToken("你好啊");
     });
     return (_ctx, _cache) => {
       return {
@@ -35,3 +36,4 @@ const _sfc_main = {
   }
 };
 wx.createPage(_sfc_main);
+//# sourceMappingURL=../../../.sourcemap/mp-weixin/pages/index/index.js.map

@@ -30,29 +30,27 @@ function isString(value) {
 }
 function objToStyle(styles) {
   if (isArray(styles)) {
-    return styles.filter(function(item) {
+    const result = styles.filter(function(item) {
       return item != null && item !== "";
     }).map(function(item) {
       return objToStyle(item);
     }).join(";");
+    return result ? result.endsWith(";") ? result : result + ";" : "";
   }
   if (isString(styles)) {
-    return styles;
+    return styles ? styles.endsWith(";") ? styles : styles + ";" : "";
   }
   if (isObj(styles)) {
-    return Object.keys(styles).filter(function(key) {
+    const result = Object.keys(styles).filter(function(key) {
       return styles[key] != null && styles[key] !== "";
     }).map(function(key) {
       return [kebabCase(key), styles[key]].join(":");
     }).join(";");
+    return result ? result.endsWith(";") ? result : result + ";" : "";
   }
   return "";
 }
-function isImageUrl(url) {
-  const imageRegex = /\.(jpeg|jpg|gif|png|svg|webp|jfif|bmp|dpg|image)/i;
-  return imageRegex.test(url);
-}
 exports.addUnit = addUnit;
 exports.isDef = isDef;
-exports.isImageUrl = isImageUrl;
 exports.objToStyle = objToStyle;
+//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/wot-design-uni/components/common/util.js.map

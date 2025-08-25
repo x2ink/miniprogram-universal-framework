@@ -85,6 +85,12 @@ const buttonProps = {
   /**
    * 按钮的唯一标识，可用于设置隐私同意授权按钮的id
    */
-  buttonId: String
+  buttonId: String,
+  /**
+   * 支付宝小程序，当 open-type 为 getAuthorize 时有效。
+   * 可选值：'phoneNumber' | 'userInfo'
+   */
+  scope: String
 };
 exports.buttonProps = buttonProps;
+//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/wot-design-uni/components/wd-button/types.js.map

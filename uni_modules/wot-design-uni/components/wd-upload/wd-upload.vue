@@ -101,9 +101,9 @@ import wdVideoPreview from '../wd-video-preview/wd-video-preview.vue'
 import wdLoading from '../wd-loading/wd-loading.vue'
 
 import { computed, ref, watch } from 'vue'
-import { context, getType, isEqual, isImageUrl, isVideoUrl, isFunction, isDef } from '../common/util'
-import { chooseFile } from './utils'
+import { context, isEqual, isImageUrl, isVideoUrl, isFunction, isDef, deepClone } from '../common/util'
 import { useTranslate } from '../composables/useTranslate'
+import { useUpload } from '../composables/useUpload'
 import {
   uploadProps,
   type UploadFileItem,
@@ -133,7 +133,8 @@ const emit = defineEmits<{
 }>()
 
 defineExpose<UploadExpose>({
-  submit: () => startUploadFiles()
+  submit: () => startUploadFiles(),
+  abort: () => abort()
 })
 
 const { translate } = useTranslate('upload')
@@ -143,6 +144,8 @@ const uploadFiles = ref<UploadFileItem[]>([])
 const showUpload = computed(() => !props.limit || uploadFiles.value.length < props.limit)
 
 const videoPreview = ref<VideoPreviewInstance>()
+
+const { startUpload, abort, chooseFile, UPLOAD_STATUS } = useUpload()
 
 watch(
   () => props.fileList,
@@ -178,7 +181,7 @@ watch(
 watch(
   () => props.beforePreview,
   (fn) => {
-    if (fn && !isFunction(fn) && getType(fn) !== 'asyncfunction') {
+    if (fn && !isFunction(fn)) {
       console.error('The type of beforePreview must be Function')
     }
   },
@@ -191,7 +194,7 @@ watch(
 watch(
   () => props.onPreviewFail,
   (fn) => {
-    if (fn && !isFunction(fn) && getType(fn) !== 'asyncfunction') {
+    if (fn && !isFunction(fn)) {
       console.error('The type of onPreviewFail must be Function')
     }
   },
@@ -204,7 +207,7 @@ watch(
 watch(
   () => props.beforeRemove,
   (fn) => {
-    if (fn && !isFunction(fn) && getType(fn) !== 'asyncfunction') {
+    if (fn && !isFunction(fn)) {
       console.error('The type of beforeRemove must be Function')
     }
   },
@@ -217,7 +220,7 @@ watch(
 watch(
   () => props.beforeUpload,
   (fn) => {
-    if (fn && !isFunction(fn) && getType(fn) !== 'asyncfunction') {
+    if (fn && !isFunction(fn)) {
       console.error('The type of beforeUpload must be Function')
     }
   },
@@ -230,7 +233,7 @@ watch(
 watch(
   () => props.beforeChoose,
   (fn) => {
-    if (fn && !isFunction(fn) && getType(fn) !== 'asyncfunction') {
+    if (fn && !isFunction(fn)) {
       console.error('The type of beforeChoose must be Function')
     }
   },
@@ -243,7 +246,7 @@ watch(
 watch(
   () => props.buildFormData,
   (fn) => {
-    if (fn && !isFunction(fn) && getType(fn) !== 'asyncfunction') {
+    if (fn && !isFunction(fn)) {
       console.error('The type of buildFormData must be Function')
     }
   },
@@ -258,48 +261,53 @@ function emitFileList() {
 }
 
 /**
- * 组件内部上传方法
- * @param file 文件
- * @param formData
- * @param options
+ *  开始上传文件
  */
-const upload: UploadMethod = (file, formData, options) => {
-  const uploadTask = uni.uploadFile({
-    url: options.action,
-    header: options.header,
-    name: options.name,
-    fileName: options.name,
-    fileType: options.fileType as 'image' | 'video' | 'audio',
-    formData,
-    filePath: file.url,
-    success(res) {
-      if (res.statusCode === options.statusCode) {
-        // 上传成功进行文件列表拼接
-        options.onSuccess(res, file, formData)
-      } else {
-        // 上传失败处理
-        options.onError({ ...res, errMsg: res.errMsg || '' }, file, formData)
-      }
-    },
-    fail(err) {
-      // 上传失败处理
-      options.onError(err, file, formData)
-    }
-  })
-  // 获取当前文件加载的百分比
-  uploadTask.onProgressUpdate((res) => {
-    options.onProgress(res, file)
-  })
-}
+function startUploadFiles() {
+  const { buildFormData, formData = {}, statusKey } = props
+  const { action, name, header = {}, accept, successStatus, uploadMethod } = props
+  const statusCode = isDef(successStatus) ? successStatus : 200
 
-const startUpload: UploadMethod = (file, formData, options) => {
-  const { statusKey, uploadMethod } = props
-  // 设置上传中，防止重复发起上传
-  file[statusKey] = 'loading'
-  if (isFunction(uploadMethod)) {
-    uploadMethod(file, formData, options)
-  } else {
-    upload(file, formData, options)
+  for (const uploadFile of uploadFiles.value) {
+    // 仅开始未上传的文件
+    if (uploadFile[statusKey] === UPLOAD_STATUS.PENDING) {
+      if (buildFormData) {
+        buildFormData({
+          file: uploadFile,
+          formData,
+          resolve: (formData: Record<string, any>) => {
+            formData &&
+              startUpload(uploadFile, {
+                action,
+                header,
+                name,
+                formData,
+                fileType: accept as 'image' | 'video' | 'audio',
+                statusCode,
+                statusKey,
+                uploadMethod,
+                onSuccess: handleSuccess,
+                onError: handleError,
+                onProgress: handleProgress
+              })
+          }
+        })
+      } else {
+        startUpload(uploadFile, {
+          action,
+          header,
+          name,
+          formData,
+          fileType: accept as 'image' | 'video' | 'audio',
+          statusCode,
+          statusKey,
+          uploadMethod,
+          onSuccess: handleSuccess,
+          onError: handleError,
+          onProgress: handleProgress
+        })
+      }
+    }
   }
 }
 
@@ -325,7 +333,7 @@ function getImageInfo(img: string) {
  * @description 初始化文件数据
  * @param {Object} file 上传的文件
  */
-function initFile(file: ChooseFile) {
+function initFile(file: ChooseFile, currentIndex?: number) {
   const { statusKey } = props
   // 状态初始化
   const initState: UploadFileItem = {
@@ -338,57 +346,13 @@ function initFile(file: ChooseFile) {
     url: file.path,
     percent: 0
   }
-
-  uploadFiles.value.push(initState)
+  if (typeof currentIndex === 'number') {
+    uploadFiles.value.splice(currentIndex, 1, initState)
+  } else {
+    uploadFiles.value.push(initState)
+  }
   if (props.autoUpload) {
     startUploadFiles()
-  }
-}
-
-/**
- *  开始上传文件
- */
-function startUploadFiles() {
-  const { buildFormData, formData = {}, statusKey } = props
-  const { action, name, header = {}, accept, successStatus } = props
-  const statusCode = isDef(successStatus) ? successStatus : 200
-
-  for (const uploadFile of uploadFiles.value) {
-    // 仅开始未上传的文件
-    if (uploadFile[statusKey] == 'pending') {
-      if (buildFormData) {
-        buildFormData({
-          file: uploadFile,
-          formData,
-          resolve: (formData: Record<string, any>) => {
-            formData &&
-              startUpload(uploadFile, formData, {
-                onSuccess: handleSuccess,
-                onError: handleError,
-                onProgress: handleProgress,
-                action,
-                header,
-                name,
-                fileName: name,
-                fileType: accept as 'image' | 'video' | 'audio',
-                statusCode
-              })
-          }
-        })
-      } else {
-        startUpload(uploadFile, formData, {
-          onSuccess: handleSuccess,
-          onError: handleError,
-          onProgress: handleProgress,
-          action,
-          header,
-          name,
-          fileName: name,
-          fileType: accept as 'image' | 'video' | 'audio',
-          statusCode
-        })
-      }
-    }
   }
 }
 
@@ -442,18 +406,19 @@ function handleProgress(res: UniApp.OnProgressUpdateResult, file: UploadFileItem
 /**
  * @description 选择文件的实际操作，将chooseFile自己用promise包了一层
  */
-function onChooseFile() {
-  const { multiple, maxSize, accept, sizeType, limit, sourceType, compressed, maxDuration, camera, beforeUpload } = props
-  // 文件选择
+function onChooseFile(currentIndex?: number) {
+  const { multiple, maxSize, accept, sizeType, limit, sourceType, compressed, maxDuration, camera, beforeUpload, extension } = props
+
   chooseFile({
-    multiple,
+    multiple: isDef(currentIndex) ? false : multiple,
     sizeType,
     sourceType,
-    maxCount: limit ? limit - uploadFiles.value.length : 9,
+    maxCount: limit ? limit - uploadFiles.value.length : limit,
     accept,
     compressed,
     maxDuration,
-    camera
+    camera,
+    extension
   })
     .then((res) => {
       // 成功选择初始化file
@@ -470,7 +435,7 @@ function onChooseFile() {
             const imageInfo = await getImageInfo(file.path)
             file.size = imageInfo.width * imageInfo.height
           }
-          Number(file.size) <= maxSize ? initFile(file) : emit('oversize', { file })
+          Number(file.size) <= maxSize ? initFile(file, currentIndex) : emit('oversize', { file })
         }
       }
 
@@ -495,7 +460,7 @@ function onChooseFile() {
 /**
  * @description 选择文件，内置拦截选择操作
  */
-function handleChoose() {
+function handleChoose(index?: number) {
   if (props.disabled) return
   const { beforeChoose } = props
 
@@ -504,11 +469,11 @@ function handleChoose() {
     beforeChoose({
       fileList: uploadFiles.value,
       resolve: (isPass: boolean) => {
-        isPass && onChooseFile()
+        isPass && onChooseFile(index)
       }
     })
   } else {
-    onChooseFile()
+    onChooseFile(index)
   }
 }
 
@@ -617,65 +582,75 @@ function handlePreviewVieo(index: number, lists: UploadFileItem[]) {
 }
 
 function onPreviewImage(file: UploadFileItem) {
-  const { beforePreview } = props
-  const lists = uploadFiles.value.filter((file) => isImage(file))
-  const index: number = lists.findIndex((item) => item.url === file.url)
-  if (beforePreview) {
-    beforePreview({
-      file,
-      index,
-      imgList: lists.map((file) => file.url),
-      resolve: (isPass: boolean) => {
-        isPass &&
-          handlePreviewImage(
-            index,
-            lists.map((file) => file.url)
-          )
-      }
-    })
+  const { beforePreview, reupload } = props
+  const fileList = deepClone(uploadFiles.value)
+  const index: number = fileList.findIndex((item) => item.url === file.url)
+  const imgList = fileList.filter((file) => isImage(file)).map((file) => file.url)
+  const imgIndex: number = imgList.findIndex((item) => item === file.url)
+  if (reupload) {
+    handleChoose(index)
   } else {
-    handlePreviewImage(
-      index,
-      lists.map((file) => file.url)
-    )
+    if (beforePreview) {
+      beforePreview({
+        file,
+        index,
+        fileList: fileList,
+        imgList: imgList,
+        resolve: (isPass: boolean) => {
+          isPass && handlePreviewImage(imgIndex, imgList)
+        }
+      })
+    } else {
+      handlePreviewImage(imgIndex, imgList)
+    }
   }
 }
 
 function onPreviewVideo(file: UploadFileItem) {
-  const { beforePreview } = props
-  const lists = uploadFiles.value.filter((file) => isVideo(file))
-  const index: number = lists.findIndex((item) => item.url === file.url)
-  if (beforePreview) {
-    beforePreview({
-      file,
-      index,
-      imgList: [],
-      resolve: (isPass: boolean) => {
-        isPass && handlePreviewVieo(index, lists)
-      }
-    })
+  const { beforePreview, reupload } = props
+  const fileList = deepClone(uploadFiles.value)
+  const index: number = fileList.findIndex((item) => item.url === file.url)
+  const videoList = fileList.filter((file) => isVideo(file))
+  const videoIndex: number = videoList.findIndex((item) => item.url === file.url)
+  if (reupload) {
+    handleChoose(index)
   } else {
-    handlePreviewVieo(index, lists)
+    if (beforePreview) {
+      beforePreview({
+        file,
+        index,
+        imgList: [],
+        fileList,
+        resolve: (isPass: boolean) => {
+          isPass && handlePreviewVieo(videoIndex, videoList)
+        }
+      })
+    } else {
+      handlePreviewVieo(videoIndex, videoList)
+    }
   }
 }
 
 function onPreviewFile(file: UploadFileItem) {
-  const { beforePreview } = props
-  const lists = uploadFiles.value.filter((file) => {
-    return !isVideo(file) && !isImage(file)
-  })
-  const index: number = lists.findIndex((item) => item.url === file.url)
-  if (beforePreview) {
-    beforePreview({
-      file,
-      index,
-      imgList: [],
-      resolve: (isPass: boolean) => {
-        isPass && handlePreviewFile(file)
-      }
-    })
+  const { beforePreview, reupload } = props
+  const fileList = deepClone(uploadFiles.value)
+  const index: number = fileList.findIndex((item) => item.url === file.url)
+  if (reupload) {
+    handleChoose(index)
   } else {
-    handlePreviewFile(file)
+    if (beforePreview) {
+      beforePreview({
+        file,
+        index,
+        imgList: [],
+        fileList,
+        resolve: (isPass: boolean) => {
+          isPass && handlePreviewFile(file)
+        }
+      })
+    } else {
+      handlePreviewFile(file)
+    }
   }
 }
 

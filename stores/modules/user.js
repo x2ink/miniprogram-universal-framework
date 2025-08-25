@@ -1,7 +1,9 @@
 import {
 	defineStore
 } from 'pinia'
-export const test_userModule = defineStore('test_user', {
+import env from "@/utils/env.js"
+const name=`${env}_user`
+export const user = defineStore(name, {
 	unistorage: true, // 是否持久化
 	state: () => {
 		return {
@@ -24,7 +26,7 @@ export const test_userModule = defineStore('test_user', {
 		},
 		clearTokenInfo() {
 			this.token === ''
-			uni.removeStorageSync('test_user')
+			uni.removeStorageSync(name)
 		}
 	}
 })

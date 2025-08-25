@@ -9,6 +9,7 @@
       :close-on-click-modal="closeOnClickModal"
       :safe-area-inset-bottom="safeAreaInsetBottom"
       :lazy-render="lazyRender"
+      :root-portal="rootPortal"
       @enter="handleOpen"
       @close="close"
       @after-enter="handleOpened"
@@ -123,13 +124,12 @@ function select(rowIndex: number, type: 'action' | 'panels', colIndex?: number) 
       colIndex
     })
   }
-  close()
+  if (props.closeOnClickAction) {
+    close()
+  }
 }
 function handleClickModal() {
   emit('click-modal')
-  // if (props.closeOnClickModal) {
-  //   close()
-  // }
 }
 function handleCancel() {
   emit('cancel')

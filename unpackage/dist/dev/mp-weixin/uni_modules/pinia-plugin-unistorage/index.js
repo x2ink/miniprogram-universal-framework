@@ -59,7 +59,7 @@ function parsePersistence(factoryOptions, store) {
       };
     } catch (e) {
       if (o.debug)
-        console.error("[pinia-plugin-persistedstate]", e);
+        common_vendor.index.__f__("error", "at uni_modules/pinia-plugin-unistorage/index.js:65", "[pinia-plugin-persistedstate]", e);
       return null;
     }
   };
@@ -71,7 +71,7 @@ function hydrateStore(store, { storage, serializer, key, debug }) {
       store.$patch(serializer == null ? void 0 : serializer.deserialize(fromStorage));
   } catch (e) {
     if (debug)
-      console.error("[pinia-plugin-persistedstate]", e);
+      common_vendor.index.__f__("error", "at uni_modules/pinia-plugin-unistorage/index.js:77", "[pinia-plugin-persistedstate]", e);
   }
 }
 function persistState(state, { storage, serializer, key, paths, debug }) {
@@ -80,7 +80,7 @@ function persistState(state, { storage, serializer, key, paths, debug }) {
     storage.setItem(key, serializer.serialize(toStore));
   } catch (e) {
     if (debug)
-      console.error("[pinia-plugin-persistedstate]", e);
+      common_vendor.index.__f__("error", "at uni_modules/pinia-plugin-unistorage/index.js:86", "[pinia-plugin-persistedstate]", e);
   }
 }
 function createPersistedState(factoryOptions = {}) {
@@ -155,3 +155,4 @@ function createUnistorage(globalOptions = {}) {
   };
 }
 exports.createUnistorage = createUnistorage;
+//# sourceMappingURL=../../../.sourcemap/mp-weixin/uni_modules/pinia-plugin-unistorage/index.js.map

@@ -52,6 +52,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         emit("click", event);
       }
     }
+    function handleGetAuthorize(event) {
+      if (props.scope === "phoneNumber") {
+        handleGetphonenumber(event);
+      } else if (props.scope === "userInfo") {
+        handleGetuserinfo(event);
+      }
+    }
     function handleGetuserinfo(event) {
       emit("getuserinfo", event.detail);
     }
@@ -140,18 +147,21 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         z: _ctx.sessionFrom,
         A: _ctx.lang,
         B: _ctx.hoverStopPropagation,
-        C: common_vendor.o(handleClick),
-        D: common_vendor.o(handleGetuserinfo),
-        E: common_vendor.o(handleConcat),
-        F: common_vendor.o(handleGetphonenumber),
-        G: common_vendor.o(handleError),
-        H: common_vendor.o(handleLaunchapp),
-        I: common_vendor.o(handleOpensetting),
-        J: common_vendor.o(handleChooseavatar),
-        K: common_vendor.o(handleAgreePrivacyAuthorization)
+        C: _ctx.scope,
+        D: common_vendor.o(handleClick),
+        E: common_vendor.o(handleGetAuthorize),
+        F: common_vendor.o(handleGetuserinfo),
+        G: common_vendor.o(handleConcat),
+        H: common_vendor.o(handleGetphonenumber),
+        I: common_vendor.o(handleError),
+        J: common_vendor.o(handleLaunchapp),
+        K: common_vendor.o(handleOpensetting),
+        L: common_vendor.o(handleChooseavatar),
+        M: common_vendor.o(handleAgreePrivacyAuthorization)
       });
     };
   }
 });
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-d858c170"]]);
 wx.createComponent(Component);
+//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/wot-design-uni/components/wd-button/wd-button.js.map

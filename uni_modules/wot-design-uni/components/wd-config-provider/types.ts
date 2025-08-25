@@ -151,20 +151,16 @@ export type buttonThemeVars = {
   buttonPlainBgColor?: string
   buttonPrimaryColor?: string
   buttonPrimaryBgColor?: string
-  buttonPrimaryBoxShadowColor?: string
   buttonSuccessColor?: string
   buttonSuccessBgColor?: string
-  buttonSuccessBoxShadowColor?: string
   buttonInfoColor?: string
   buttonInfoBgColor?: string
   buttonInfoPlainBorderColor?: string
   buttonInfoPlainNormalColor?: string
   buttonWarningColor?: string
   buttonWarningBgColor?: string
-  buttonWarningBoxShadowColor?: string
   buttonErrorColor?: string
   buttonErrorBgColor?: string
-  buttonErrorBoxShadowColor?: string
   buttonTextHoverOpacity?: string
 }
 
@@ -186,15 +182,18 @@ export type cellThemeVars = {
   cellLabelFs?: string
   cellLabelColor?: string
   cellValueFs?: string
+  cellValueFsLarge?: string
   cellValueColor?: string
   cellArrowSize?: string
   cellArrowColor?: string
+  cellClearColor?: string
   cellTapBg?: string
   cellTitleFsLarge?: string
   cellLabelFsLarge?: string
   cellIconSizeLarge?: string
   cellRequiredColor?: string
   cellRequiredSize?: string
+  cellRequiredMargin?: string
   cellVerticalTop?: string
 }
 
@@ -212,10 +211,12 @@ export type calendarThemeVars = {
   calendarDayHeight?: string
   calendarMonthWidth?: string
   calendarActiveColor?: string
+  calendarSelectedColor?: string
   calendarDisabledColor?: string
   calendarRangeColor?: string
   calendarActiveBorder?: string
   calendarInfoFs?: string
+  calendarItemMarginBottom?: string
 }
 
 export type checkboxThemeVars = {
@@ -262,9 +263,18 @@ export type collapseThemeVars = {
 
 export type dividerThemeVars = {
   dividerPadding?: string
+  dividerMargin?: string
   dividerColor?: string
   dividerLineColor?: string
+  dividerLineHeight?: string
   dividerFs?: string
+  dividerContentLeftWidth?: string
+  dividerContentLeftMargin?: string
+  dividerContentRightMargin?: string
+  dividerContentRightWidth?: string
+  dividerVerticalHeight?: string
+  dividerVerticalContentMargin?: string
+  dividerVerticalLineWidth?: string
 }
 
 export type dropMenuThemeVars = {
@@ -472,9 +482,8 @@ export type progressThemeVars = {
   progressBg?: string
   progressDangerColor?: string
   progressSuccessColor?: string
+  progressWarningColor?: string
   progressColor?: string
-  progressLinearSuccessColor?: string
-  progressLinearDangerColor?: string
   progressHeight?: string
   progressLabelColor?: string
   progressLabelFs?: string
@@ -622,15 +631,19 @@ export type tagThemeVars = {
 }
 
 export type toastThemeVars = {
+  toastColor?: string
   toastPadding?: string
   toastMaxWidth?: string
   toastRadius?: string
   toastBg?: string
   toastFs?: string
+  toastLineHeight?: string
   toastWithIconMinWidth?: string
   toastIconSize?: string
   toastIconMarginRight?: string
+  toastIconMarginBottom?: string
   toastLoadingPadding?: string
+  toastLoadingMarginBottom?: string
   toastBoxShadow?: string
 }
 
@@ -670,6 +683,8 @@ export type gridItemThemeVars = {
   gridItemBg?: string
   gridItemPadding?: string
   gridItemBorderColor?: string
+  gridItemHoverBg?: string
+  gridItemHoverBgDark?: string
 }
 
 export type statustipThemeVars = {
@@ -962,6 +977,14 @@ export type floatingPanelThemeVars = {
   floatingPanelContentBg?: string
 }
 
+export type signatureThemeVars = {
+  signatureBg?: string
+  signatureRadius?: string
+  signatureBorder?: string
+  signatureFooterMarginTop?: string
+  signatureButtonMarginLeft?: string
+}
+
 export type ConfigProviderThemeVars = baseThemeVars &
   actionSheetThemeVars &
   badgeThemeVars &
@@ -1025,4 +1048,5 @@ export type ConfigProviderThemeVars = baseThemeVars &
   textThemeVars &
   videoPreviewThemeVars &
   imgCropperThemeVars &
-  floatingPanelThemeVars
+  floatingPanelThemeVars &
+  signatureThemeVars

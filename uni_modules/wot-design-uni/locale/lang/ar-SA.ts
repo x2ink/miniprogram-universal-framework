@@ -123,5 +123,11 @@ export default {
   },
   tableCol: {
     indexLabel: 'فهرس'
+  },
+  signature: {
+    confirmText: 'تأكيد',
+    clearText: 'مسح',
+    revokeText: 'تراجع',
+    restoreText: 'استعادة'
   }
 }

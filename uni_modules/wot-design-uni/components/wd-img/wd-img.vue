@@ -1,3 +1,11 @@
+<!--
+ * @Author: 810505339
+ * @Date: 2024-09-25 11:30:46
+ * @LastEditors: 810505339
+ * @LastEditTime: 2025-01-09 11:37:45
+ * @FilePath: \wot-design-uni\src\uni_modules\wot-design-uni\components\wd-img\wd-img.vue
+ * 记得注释
+-->
 <template>
   <view :class="rootClass" @click="handleClick" :style="rootStyle">
     <image
@@ -49,7 +57,7 @@ const rootStyle = computed(() => {
     style['border-radius'] = addUnit(props.radius)
     style['overflow'] = 'hidden'
   }
-  return `${objToStyle(style)};${props.customStyle}`
+  return `${objToStyle(style)}${props.customStyle}`
 })
 
 const rootClass = computed(() => {
@@ -63,9 +71,9 @@ function handleError(event: any) {
   emit('error', event)
 }
 function handleClick(event: MouseEvent) {
-  if (props.enablePreview && props.src) {
+  if (props.enablePreview && props.src && status.value == 'success') {
     uni.previewImage({
-      urls: [props.src]
+      urls: [props.previewSrc || props.src]
     })
   }
   emit('click', event)

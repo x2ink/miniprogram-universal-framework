@@ -1,37 +1,38 @@
 <template>
-  <view :class="`wd-select-picker ${cell.border.value ? 'is-border' : ''} ${customClass}`" :style="customStyle">
-    <view class="wd-select-picker__field" @click="open">
-      <slot v-if="useDefaultSlot"></slot>
-      <view
-        v-else
-        :class="`wd-select-picker__cell ${disabled && 'is-disabled'} ${readonly && 'is-readonly'} ${alignRight && 'is-align-right'} ${
-          error && 'is-error'
-        } ${size && 'is-' + size}`"
-      >
-        <view
-          v-if="label || useLabelSlot"
-          :class="`wd-select-picker__label ${isRequired && 'is-required'} ${customLabelClass}`"
-          :style="labelWidth ? 'min-width:' + labelWidth + ';max-width:' + labelWidth + ';' : ''"
-        >
-          <block v-if="label">{{ label }}</block>
-          <slot v-else name="label"></slot>
+  <view :class="`wd-select-picker ${customClass}`" :style="customStyle">
+    <wd-cell
+      v-if="!$slots.default"
+      :title="label"
+      :value="showValue || placeholder || translate('placeholder')"
+      :required="required"
+      :size="size"
+      :title-width="labelWidth"
+      :prop="prop"
+      :rules="rules"
+      :clickable="!disabled && !readonly"
+      :value-align="alignRight ? 'right' : 'left'"
+      :center="center"
+      :custom-class="cellClass"
+      :custom-style="customStyle"
+      :custom-title-class="customLabelClass"
+      :custom-value-class="customValueClass"
+      :ellipsis="ellipsis"
+      :use-title-slot="!!$slots.label"
+      :marker-side="markerSide"
+      @click="open"
+    >
+      <template v-if="$slots.label" #title>
+        <slot name="label"></slot>
+      </template>
+      <template #right-icon>
+        <wd-icon v-if="showArrow" custom-class="wd-select-picker__arrow" name="arrow-right" />
+        <view v-else-if="showClear" @click.stop="handleClear">
+          <wd-icon custom-class="wd-select-picker__clear" name="error-fill" />
         </view>
-        <view class="wd-select-picker__body">
-          <view class="wd-select-picker__value-wraper">
-            <view
-              :class="`wd-select-picker__value ${ellipsis && 'is-ellipsis'} ${customValueClass} ${
-                showValue ? '' : 'wd-select-picker__value--placeholder'
-              }`"
-            >
-              {{ showValue || placeholder || translate('placeholder') }}
-            </view>
-            <wd-icon v-if="showArrow" custom-class="wd-select-picker__arrow" name="arrow-right" />
-            <wd-icon v-else-if="showClear" custom-class="wd-select-picker__clear" name="error-fill" @click.stop="handleClear" />
-          </view>
-
-          <view v-if="errorMessage" class="wd-select-picker__error-message">{{ errorMessage }}</view>
-        </view>
-      </view>
+      </template>
+    </wd-cell>
+    <view v-else @click="open">
+      <slot></slot>
     </view>
     <wd-action-sheet
       v-model="pickerShow"
@@ -40,6 +41,7 @@
       :close-on-click-modal="closeOnClickModal"
       :z-index="zIndex"
       :safe-area-inset-bottom="safeAreaInsetBottom"
+      :root-portal="rootPortal"
       @close="close"
       @opened="scrollIntoView ? setScrollIntoView() : ''"
       custom-header-class="wd-select-picker__header"
@@ -83,7 +85,7 @@
               <wd-radio :value="item[valueKey]" :disabled="item.disabled">
                 <block v-if="filterable && filterVal">
                   <block v-for="text in item[labelKey]" :key="text.label">
-                    <text :clsss="`${text.type === 'active' ? 'wd-select-picker__text-active' : ''}`">{{ text.label }}</text>
+                    <text :class="`${text.type === 'active' ? 'wd-select-picker__text-active' : ''}`">{{ text.label }}</text>
                   </block>
                 </block>
                 <block v-else>
@@ -123,12 +125,10 @@ import wdRadio from '../wd-radio/wd-radio.vue'
 import wdRadioGroup from '../wd-radio-group/wd-radio-group.vue'
 import wdButton from '../wd-button/wd-button.vue'
 import wdLoading from '../wd-loading/wd-loading.vue'
+import wdCell from '../wd-cell/wd-cell.vue'
 
 import { getCurrentInstance, onBeforeMount, ref, watch, nextTick, computed } from 'vue'
-import { useCell } from '../composables/useCell'
-import { getRect, isArray, isDef, isFunction, requestAnimationFrame } from '../common/util'
-import { useParent } from '../composables/useParent'
-import { FORM_KEY, type FormItemRule } from '../wd-form/types'
+import { getRect, isArray, isDef, isFunction, pause } from '../common/util'
 import { useTranslate } from '../composables/useTranslate'
 import { selectPickerProps, type SelectPickerExpose } from './types'
 
@@ -144,7 +144,6 @@ const lastSelectList = ref<Array<number | boolean | string> | number | boolean |
 const filterVal = ref<string>('')
 const filterColumns = ref<Array<Record<string, any>>>([])
 const scrollTop = ref<number>(0) // 滚动位置
-const cell = useCell()
 
 const showValue = computed(() => {
   const value = valueFormat(props.modelValue)
@@ -171,6 +170,15 @@ const showValue = computed(() => {
     }
   }
   return showValueTemp
+})
+
+const cellClass = computed(() => {
+  const classes = ['wd-select-picker__cell']
+  if (props.disabled) classes.push('is-disabled')
+  if (props.readonly) classes.push('is-readonly')
+  if (props.error) classes.push('is-error')
+  if (!showValue.value) classes.push('wd-select-picker__cell--placeholder')
+  return classes.join(' ')
 })
 
 watch(
@@ -227,31 +235,6 @@ watch(
   }
 )
 
-const { parent: form } = useParent(FORM_KEY)
-
-// 表单校验错误信息
-const errorMessage = computed(() => {
-  if (form && props.prop && form.errorMessages && form.errorMessages[props.prop]) {
-    return form.errorMessages[props.prop]
-  } else {
-    return ''
-  }
-})
-
-// 是否展示必填
-const isRequired = computed(() => {
-  let formRequired = false
-  if (form && form.props.rules) {
-    const rules = form.props.rules
-    for (const key in rules) {
-      if (Object.prototype.hasOwnProperty.call(rules, key) && key === props.prop && Array.isArray(rules[key])) {
-        formRequired = rules[key].some((rule: FormItemRule) => rule.required)
-      }
-    }
-  }
-  return props.required || props.rules.some((rule) => rule.required) || formRequired
-})
-
 onBeforeMount(() => {
   selectList.value = valueFormat(props.modelValue)
   filterColumns.value = props.columns
@@ -259,7 +242,7 @@ onBeforeMount(() => {
 
 const { proxy } = getCurrentInstance() as any
 
-function setScrollIntoView() {
+async function setScrollIntoView() {
   let wraperSelector: string = ''
   let selectorPromise: Promise<UniApp.NodeInfo>[] = []
   if (isDef(selectList.value) && selectList.value !== '' && !isArray(selectList.value)) {
@@ -272,27 +255,24 @@ function setScrollIntoView() {
     wraperSelector = '#wd-checkbox-group'
   }
   if (wraperSelector) {
-    requestAnimationFrame().then(() => {
-      requestAnimationFrame().then(() => {
-        Promise.all([getRect('.wd-select-picker__wrapper', false, proxy), getRect(wraperSelector, false, proxy), ...selectorPromise]).then((res) => {
-          if (isDef(res) && isArray(res)) {
-            const scrollView = res[0]
-            const wraper = res[1]
-            const target = res.slice(2) || []
-            if (isDef(wraper) && isDef(scrollView)) {
-              const index = target.findIndex((item) => {
-                return item.bottom! > scrollView.top! && item.top! < scrollView.bottom!
-              })
-              if (index < 0) {
-                scrollTop.value = -1
-                nextTick(() => {
-                  scrollTop.value = Math.max(0, target[0].top! - wraper.top! - scrollView.height! / 2)
-                })
-              }
-            }
+    await pause(2000 / 30)
+    Promise.all([getRect('.wd-select-picker__wrapper', false, proxy), getRect(wraperSelector, false, proxy), ...selectorPromise]).then((res) => {
+      if (isDef(res) && isArray(res)) {
+        const scrollView = res[0]
+        const wraper = res[1]
+        const target = res.slice(2) || []
+        if (isDef(wraper) && isDef(scrollView)) {
+          const index = target.findIndex((item) => {
+            return item.bottom! > scrollView.top! && item.top! < scrollView.bottom!
+          })
+          if (index < 0) {
+            scrollTop.value = -1
+            nextTick(() => {
+              scrollTop.value = Math.max(0, target[0].top! - wraper.top! - scrollView.height! / 2)
+            })
           }
-        })
-      })
+        }
+      }
     })
   }
 }

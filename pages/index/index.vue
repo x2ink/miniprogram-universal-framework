@@ -12,12 +12,11 @@
 	import {
 		onMounted
 	} from 'vue';
-	import {
-		userStore
-	} from '@/stores';
 	import $http from "@/api/index.js"
+	import $store from '@/stores/index.js'
 	onMounted(() => {
-		console.log(userStore().token);
+	console.log($store.user.loginStatus);
+	$store.user.setToken("你好啊")
 	})
 </script>
 

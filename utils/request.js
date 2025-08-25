@@ -1,11 +1,6 @@
-var baseUrl;
-if (process.env.NODE_ENV === 'development') {
-	console.log('开发环境');
-	baseUrl = "http://127.0.0.1:8002/"
-} else {
-	console.log('生产环境');
-	baseUrl = "http://127.0.0.1/"
-}
+import env from "@/utils/env.js"
+var baseUrl=env==="dev"?'https://dev.x2.ink/api/':'https://pro.x2.ink/api/';
+console.log(baseUrl);
 const http = {
 	baseUrl: baseUrl,
 	request(config) {

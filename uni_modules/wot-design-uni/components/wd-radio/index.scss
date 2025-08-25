@@ -93,6 +93,7 @@
     font-size: $-radio-label-fs;
     color: $-radio-label-color;
     line-height: 20px;
+    word-break: break-all;
   }
   @include when(checked) {
     .wd-radio__shape {
@@ -172,6 +173,10 @@
     }
   }
 
+  &.icon-placement-left {
+    flex-direction: row-reverse;
+  }
+
   @include when(inline) {
     display: inline-block;
     margin-top: 0;
@@ -199,6 +204,14 @@
         .wd-radio__shape {
           margin-top: 0;
         }
+      }
+    }
+
+    &.icon-placement-right {
+      .wd-radio__shape {
+        margin-right: 0;
+        margin-left: 4px;
+        float: right;
       }
     }
   }

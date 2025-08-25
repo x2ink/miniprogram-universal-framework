@@ -18,7 +18,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const props = __props;
     const emit = __emit;
     const isImage = common_vendor.computed(() => {
-      return uni_modules_wotDesignUni_components_common_util.isDef(props.name) && uni_modules_wotDesignUni_components_common_util.isImageUrl(props.name);
+      return uni_modules_wotDesignUni_components_common_util.isDef(props.name) && props.name.includes("/");
     });
     const rootClass = common_vendor.computed(() => {
       const prefix = props.classPrefix;
@@ -32,7 +32,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (props.size) {
         style["font-size"] = uni_modules_wotDesignUni_components_common_util.addUnit(props.size);
       }
-      return `${uni_modules_wotDesignUni_components_common_util.objToStyle(style)}; ${props.customStyle}`;
+      return `${uni_modules_wotDesignUni_components_common_util.objToStyle(style)} ${props.customStyle}`;
     });
     function handleClick(event) {
       emit("click", event);
@@ -52,3 +52,4 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
 });
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-24906af6"]]);
 wx.createComponent(Component);
+//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/wot-design-uni/components/wd-icon/wd-icon.js.map

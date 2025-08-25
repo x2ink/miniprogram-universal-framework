@@ -26,12 +26,17 @@ export type IndicatorPositionType = 'left' | 'top-left' | 'top' | 'top-right' | 
  */
 export type AdjustHeightType = 'first' | 'current' | 'highest' | 'none'
 
+// 资源类型
+export type SwiperItemType = 'image' | 'video'
+
 export interface SwiperList {
   [key: string]: any
   // 图片、视频等资源地址
   value?: string
   // 视频资源的封面
   poster?: string
+  // 资源文件类型，可选值：'image' | 'video'
+  type?: SwiperItemType
 }
 
 export const swiperProps = {
@@ -109,6 +114,20 @@ export const swiperProps = {
    * 默认值：true
    */
   loop: makeBooleanProp(true),
+
+  /**
+   * 视频是否循环播放
+   * 类型：boolean
+   * 默认值：true
+   */
+  videoLoop: makeBooleanProp(true),
+
+  /**
+   * 视频是否静音播放
+   * 类型：boolean
+   * 默认值：true
+   */
+  muted: makeBooleanProp(true),
 
   /**
    * 后边距

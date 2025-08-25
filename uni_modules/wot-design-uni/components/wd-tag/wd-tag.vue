@@ -73,7 +73,7 @@ watch(
     if (type.indexOf(newValue) === -1) console.error(`type must be one of ${type.toString()}`)
     computeTagClass()
   },
-  { deep: true, immediate: true }
+  { immediate: true }
 )
 
 watch(
@@ -81,7 +81,7 @@ watch(
   () => {
     computeTagClass()
   },
-  { deep: true, immediate: true }
+  { immediate: true }
 )
 
 const rootClass = computed(() => {
@@ -96,7 +96,7 @@ const rootStyle = computed(() => {
   if (props.bgColor) {
     rootStyle['border-color'] = props.bgColor
   }
-  return `${objToStyle(rootStyle)};${props.customStyle}`
+  return `${objToStyle(rootStyle)}${props.customStyle}`
 })
 
 const textStyle = computed(() => {

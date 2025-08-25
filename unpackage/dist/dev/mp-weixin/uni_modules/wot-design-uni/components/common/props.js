@@ -1,4 +1,5 @@
 "use strict";
+const numericProp = [Number, String];
 const makeRequiredProp = (type) => ({
   type,
   required: true
@@ -25,3 +26,5 @@ exports.baseProps = baseProps;
 exports.makeBooleanProp = makeBooleanProp;
 exports.makeRequiredProp = makeRequiredProp;
 exports.makeStringProp = makeStringProp;
+exports.numericProp = numericProp;
+//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/wot-design-uni/components/common/props.js.map

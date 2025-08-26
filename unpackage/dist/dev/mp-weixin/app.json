@@ -1,6 +1,12 @@
 {
   "pages": [
-    "pages/index/index"
+    "pages/index/index",
+    "pages/camera/camera",
+    "pages/setting/setting",
+    "pages/agreement/agreement",
+    "pages/record/record",
+    "pages/myreservation/myreservation",
+    "pages/confirmorder/confirmorder"
   ],
   "window": {
     "navigationBarTextStyle": "black",

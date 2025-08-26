@@ -1,20 +1,21 @@
 <template>
-	<view class="navbar">
-		<!-- 状态栏的高度 -->
+	<view class="navbar" :style="{background}">
+		<!-- height of status bar -->
 		<view :style="{height:navBarHeight}"></view>
-		<!--  导航栏-->
-		<view class="nav">
-			<!-- 返回按钮 -->
-			<image class="back" src="/static/logo.png" mode="aspectFit"></image>
-			<image class="avatar" src="/static/logo.png" mode="aspectFit"></image>
-			<view>
-				三星堆影像馆
+		<!--  navigation -->
+		<view v-if="!hideNav" class="nav">
+			<!-- back button -->
+			<view v-if="type=='avatar'" style="display: flex;align-items: center;">
+				<image class="avatar" src="/static/logo.png" mode="aspectFit"></image>
+				<view class="avatar-title">
+					{{avatarTitle}}
+				</view>
+			</view>
+			<view v-else class="backs">
+				<image class="back" src="/static/logo.png" mode="aspectFit"></image>
+				<text>{{navTitle}}</text>
 			</view>
 		</view>
-		<!-- <view @click="back()" class="nav-btn">
-			<text class="fas fa-arrow-left"></text>
-		</view>
-		<view class="navbar-title">{{title}}</view> -->
 	</view>
 </template>
 
@@ -35,28 +36,73 @@
 		navBarHeight.value = statusBarHeight + 'px'
 	})
 	const props = defineProps({
+		background: {
+			type: String,
+			default: 'transparent'
+		},
 		title: {
 			type: String,
 			default: ""
+		},
+		navTitle: {
+			type: String,
+			default: ''
+		},
+		avatarTitle: {
+			type: String,
+			default: '三星堆影像馆'
+		},
+		hideNav: {
+			default: false,
+			type: Boolean
+		},
+		type: {
+			type: String,
+			default: "avatar"
 		}
 	})
 </script>
 
 <style scoped lang="scss">
 	.navbar {
-		.nav {
-			background-color: red;
-			display: flex;
-			align-items: center;
+		padding: 0 32rpx 24rpx 32rpx;
 
-			.back {
-				width: 60rpx;
-				height: 60rpx;
+		.nav {
+			position: relative;
+
+			.backs {
+				display: flex;
+				align-items: center;
+
+				.back {
+					width: 60rpx;
+					height: 60rpx;
+				}
+
+				text {
+					font-size: 34rpx;
+					color: #FFFFFF;
+					position: absolute;
+					left: 50%;
+					top: 50%;
+					transform: translateX(-50%) translateY(-50%);
+				}
+			}
+
+
+			.avatar-title {
+				font-weight: 500;
+				font-size: 28rpx;
+				color: #FFFFFF;
 			}
 
 			.avatar {
-				width: 60rpx;
-				height: 60rpx;
+				width: 64rpx;
+				height: 64rpx;
+				background: #D8D8D8;
+				border: 2rpx solid #979797;
+				border-radius: 50%;
+				margin-right: 16rpx;
 			}
 		}
 

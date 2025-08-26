@@ -4,6 +4,7 @@
   "usingComponents": {
     "navbar": "../../components/navbar/navbar",
     "home": "./home",
-    "myself": "./myself"
+    "myself": "./myself",
+    "login": "../../components/login/login"
   }
 }

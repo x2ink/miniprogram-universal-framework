@@ -1,7 +1,54 @@
 {
   "libVersion": "3.9.2",
   "projectname": "%E4%B8%89%E6%98%9F%E5%A0%86",
-  "condition": {},
+  "condition": {
+    "miniprogram": {
+      "list": [
+        {
+          "name": "pages/confirmorder/confirmorder",
+          "pathName": "pages/confirmorder/confirmorder",
+          "query": "",
+          "scene": null,
+          "launchMode": "default"
+        },
+        {
+          "name": "pages/myreservation/myreservation",
+          "pathName": "pages/myreservation/myreservation",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "pages/record/record",
+          "pathName": "pages/record/record",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "pages/agreement/agreement",
+          "pathName": "pages/agreement/agreement",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "pages/setting/setting",
+          "pathName": "pages/setting/setting",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "pages/camera/camera",
+          "pathName": "pages/camera/camera",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        }
+      ]
+    }
+  },
   "setting": {
     "urlCheck": false,
     "coverView": false,

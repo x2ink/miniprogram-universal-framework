@@ -32,17 +32,23 @@
   flex: 1;
 }
 .root .tabbar {
-  height: 120rpx;
+  height: 88rpx;
   display: flex;
   align-items: center;
-  background-color: red;
+}
+.root .tabbar .tabbar-active {
+  color: #FFFFFF !important;
 }
 .root .tabbar .tabbar-item {
+  flex-direction: column;
   display: flex;
   align-items: center;
   flex: 1;
+  color: rgba(240, 240, 240, 0.53);
+  font-size: 20rpx;
 }
 .root .tabbar .tabbar-item image {
-  width: 60rpx;
-  height: 60rpx;
+  width: 40rpx;
+  height: 40rpx;
+  margin-bottom: 4rpx;
 }

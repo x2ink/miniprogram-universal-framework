@@ -4,6 +4,12 @@ const common_vendor = require("./common/vendor.js");
 const uni_modules_piniaPluginUnistorage_index = require("./uni_modules/pinia-plugin-unistorage/index.js");
 if (!Math) {
   "./pages/index/index.js";
+  "./pages/camera/camera.js";
+  "./pages/setting/setting.js";
+  "./pages/agreement/agreement.js";
+  "./pages/record/record.js";
+  "./pages/myreservation/myreservation.js";
+  "./pages/confirmorder/confirmorder.js";
 }
 const _sfc_main = {
   onLaunch: function() {

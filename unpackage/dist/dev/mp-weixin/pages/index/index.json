@@ -1,6 +1,9 @@
 {
-  "navigationBarTitleText": "uni-app",
+  "navigationStyle": "custom",
+  "disableScroll": true,
   "usingComponents": {
-    "wd-button": "../../uni_modules/wot-design-uni/components/wd-button/wd-button"
+    "navbar": "../../components/navbar/navbar",
+    "home": "./home",
+    "myself": "./myself"
   }
 }

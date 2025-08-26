@@ -1,0 +1,92 @@
+<template>
+	<view class="navbar">
+		<!-- 状态栏的高度 -->
+		<view :style="{height:navBarHeight}"></view>
+		<!--  导航栏-->
+		<view class="nav">
+			<!-- 返回按钮 -->
+			<image class="back" src="/static/logo.png" mode="aspectFit"></image>
+			<image class="avatar" src="/static/logo.png" mode="aspectFit"></image>
+			<view>
+				三星堆影像馆
+			</view>
+		</view>
+		<!-- <view @click="back()" class="nav-btn">
+			<text class="fas fa-arrow-left"></text>
+		</view>
+		<view class="navbar-title">{{title}}</view> -->
+	</view>
+</template>
+
+<script setup>
+	import {
+		ref,
+		onMounted
+	} from 'vue'
+	const navBarHeight = ref(0)
+	const back = () => {
+		uni.navigateBack({
+			delta: 1
+		})
+	}
+	onMounted(() => {
+		const systemInfo = wx.getWindowInfo();
+		const statusBarHeight = systemInfo.statusBarHeight;
+		navBarHeight.value = statusBarHeight + 'px'
+	})
+	const props = defineProps({
+		title: {
+			type: String,
+			default: ""
+		}
+	})
+</script>
+
+<style scoped lang="scss">
+	.navbar {
+		.nav {
+			background-color: red;
+			display: flex;
+			align-items: center;
+
+			.back {
+				width: 60rpx;
+				height: 60rpx;
+			}
+
+			.avatar {
+				width: 60rpx;
+				height: 60rpx;
+			}
+		}
+
+		// position: fixed;
+		// left: 0;
+		// right: 0;
+		// top: 0;
+		// background-color: white;
+		// height: 45px;
+		// display: flex;
+		// align-items: center;
+		// justify-content: space-between;
+		// padding: 0 12px;
+		// .navbar-title {
+		// 	font-weight: 600;
+		// 	font-size: 18px;
+		// 	position: absolute;
+		// 	left: 50%;
+		// 	transform: translateX(-50%);
+		// }
+
+		// .nav-btn {
+		// 	width: 40px;
+		// 	height: 40px;
+		// 	display: flex;
+		// 	align-items: center;
+		// 	justify-content: center;
+		// 	color: #333;
+		// 	font-size: 18px;
+		// }
+
+	}
+</style>

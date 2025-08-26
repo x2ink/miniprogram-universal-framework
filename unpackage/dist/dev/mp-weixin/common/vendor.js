@@ -68,8 +68,8 @@ const capitalize = cacheStringFunction((str) => {
   return str.charAt(0).toUpperCase() + str.slice(1);
 });
 const toHandlerKey = cacheStringFunction((str) => {
-  const s2 = str ? `on${capitalize(str)}` : ``;
-  return s2;
+  const s = str ? `on${capitalize(str)}` : ``;
+  return s;
 });
 const hasChanged = (value, oldValue) => !Object.is(value, oldValue);
 const invokeArrayFns$1 = (fns, arg) => {
@@ -85,59 +85,9 @@ const def = (obj, key, value) => {
   });
 };
 const looseToNumber = (val) => {
-  const n2 = parseFloat(val);
-  return isNaN(n2) ? val : n2;
+  const n = parseFloat(val);
+  return isNaN(n) ? val : n;
 };
-function normalizeStyle(value) {
-  if (isArray(value)) {
-    const res = {};
-    for (let i = 0; i < value.length; i++) {
-      const item = value[i];
-      const normalized = isString(item) ? parseStringStyle(item) : normalizeStyle(item);
-      if (normalized) {
-        for (const key in normalized) {
-          res[key] = normalized[key];
-        }
-      }
-    }
-    return res;
-  } else if (isString(value) || isObject(value)) {
-    return value;
-  }
-}
-const listDelimiterRE = /;(?![^(]*\))/g;
-const propertyDelimiterRE = /:([^]+)/;
-const styleCommentRE = /\/\*[^]*?\*\//g;
-function parseStringStyle(cssText) {
-  const ret = {};
-  cssText.replace(styleCommentRE, "").split(listDelimiterRE).forEach((item) => {
-    if (item) {
-      const tmp = item.split(propertyDelimiterRE);
-      tmp.length > 1 && (ret[tmp[0].trim()] = tmp[1].trim());
-    }
-  });
-  return ret;
-}
-function normalizeClass(value) {
-  let res = "";
-  if (isString(value)) {
-    res = value;
-  } else if (isArray(value)) {
-    for (let i = 0; i < value.length; i++) {
-      const normalized = normalizeClass(value[i]);
-      if (normalized) {
-        res += normalized + " ";
-      }
-    }
-  } else if (isObject(value)) {
-    for (const name in value) {
-      if (value[name]) {
-        res += name + " ";
-      }
-    }
-  }
-  return res.trim();
-}
 const LOCALE_ZH_HANS = "zh-Hans";
 const LOCALE_ZH_HANT = "zh-Hant";
 const LOCALE_EN = "en";
@@ -2612,15 +2562,6 @@ function inject(key, defaultValue, treatDefaultAsFactory = false) {
 function hasInjectionContext() {
   return !!(currentInstance || currentRenderingInstance || currentApp);
 }
-/*! #__NO_SIDE_EFFECTS__ */
-// @__NO_SIDE_EFFECTS__
-function defineComponent(options, extraOptions) {
-  return isFunction(options) ? (
-    // #8326: extend call and options.name access are considered side-effects
-    // by Rollup, so we have to wrap it in a pure-annotated IIFE.
-    /* @__PURE__ */ (() => extend({ name: options.name }, extraOptions, { setup: options }))()
-  ) : options;
-}
 const isKeepAlive = (vnode) => vnode.type.__isKeepAlive;
 function onActivated(hook, target) {
   registerKeepAliveHook(hook, "a", target);
@@ -3831,12 +3772,6 @@ const Comment = Symbol.for("v-cmt");
 const Static = Symbol.for("v-stc");
 function isVNode(value) {
   return value ? value.__v_isVNode === true : false;
-}
-const InternalObjectKey = `__vInternal`;
-function guardReactiveProps(props) {
-  if (!props)
-    return null;
-  return isProxy(props) || InternalObjectKey in props ? extend({}, props) : props;
 }
 const emptyAppContext = createAppContext();
 let uid = 0;
@@ -5078,11 +5013,6 @@ function initApp(app) {
   }
 }
 const propsCaches = /* @__PURE__ */ Object.create(null);
-function renderProps(props) {
-  const { uid: uid2, __counter } = getCurrentInstance();
-  const propsId = (propsCaches[uid2] || (propsCaches[uid2] = [])).push(guardReactiveProps(props)) - 1;
-  return uid2 + "," + propsId + "," + __counter;
-}
 function pruneComponentPropsCache(uid2) {
   delete propsCaches[uid2];
 }
@@ -5123,121 +5053,40 @@ function getCreateApp() {
     return my[method];
   }
 }
-function stringifyStyle(value) {
-  if (isString(value)) {
-    return value;
-  }
-  return stringify(normalizeStyle(value));
-}
-function stringify(styles) {
-  let ret = "";
-  if (!styles || isString(styles)) {
-    return ret;
-  }
-  for (const key in styles) {
-    ret += `${key.startsWith(`--`) ? key : hyphenate(key)}:${styles[key]};`;
+function vFor(source, renderItem) {
+  let ret;
+  if (isArray(source) || isString(source)) {
+    ret = new Array(source.length);
+    for (let i = 0, l = source.length; i < l; i++) {
+      ret[i] = renderItem(source[i], i, i);
+    }
+  } else if (typeof source === "number") {
+    if (!Number.isInteger(source)) {
+      warn(`The v-for range expect an integer value but got ${source}.`);
+      return [];
+    }
+    ret = new Array(source);
+    for (let i = 0; i < source; i++) {
+      ret[i] = renderItem(i + 1, i, i);
+    }
+  } else if (isObject(source)) {
+    if (source[Symbol.iterator]) {
+      ret = Array.from(source, (item, i) => renderItem(item, i, i));
+    } else {
+      const keys = Object.keys(source);
+      ret = new Array(keys.length);
+      for (let i = 0, l = keys.length; i < l; i++) {
+        const key = keys[i];
+        ret[i] = renderItem(source[key], key, i);
+      }
+    }
+  } else {
+    ret = [];
   }
   return ret;
 }
-function vOn(value, key) {
-  const instance = getCurrentInstance();
-  const ctx = instance.ctx;
-  const extraKey = typeof key !== "undefined" && (ctx.$mpPlatform === "mp-weixin" || ctx.$mpPlatform === "mp-qq" || ctx.$mpPlatform === "mp-xhs") && (isString(key) || typeof key === "number") ? "_" + key : "";
-  const name = "e" + instance.$ei++ + extraKey;
-  const mpInstance = ctx.$scope;
-  if (!value) {
-    delete mpInstance[name];
-    return name;
-  }
-  const existingInvoker = mpInstance[name];
-  if (existingInvoker) {
-    existingInvoker.value = value;
-  } else {
-    mpInstance[name] = createInvoker(value, instance);
-  }
-  return name;
-}
-function createInvoker(initialValue, instance) {
-  const invoker = (e2) => {
-    patchMPEvent(e2);
-    let args = [e2];
-    if (instance && instance.ctx.$getTriggerEventDetail) {
-      if (typeof e2.detail === "number") {
-        e2.detail = instance.ctx.$getTriggerEventDetail(e2.detail);
-      }
-    }
-    if (e2.detail && e2.detail.__args__) {
-      args = e2.detail.__args__;
-    }
-    const eventValue = invoker.value;
-    const invoke = () => callWithAsyncErrorHandling(patchStopImmediatePropagation(e2, eventValue), instance, 5, args);
-    const eventTarget = e2.target;
-    const eventSync = eventTarget ? eventTarget.dataset ? String(eventTarget.dataset.eventsync) === "true" : false : false;
-    if (bubbles.includes(e2.type) && !eventSync) {
-      setTimeout(invoke);
-    } else {
-      const res = invoke();
-      if (e2.type === "input" && (isArray(res) || isPromise(res))) {
-        return;
-      }
-      return res;
-    }
-  };
-  invoker.value = initialValue;
-  return invoker;
-}
-const bubbles = [
-  // touch事件暂不做延迟，否则在 Android 上会影响性能，比如一些拖拽跟手手势等
-  // 'touchstart',
-  // 'touchmove',
-  // 'touchcancel',
-  // 'touchend',
-  "tap",
-  "longpress",
-  "longtap",
-  "transitionend",
-  "animationstart",
-  "animationiteration",
-  "animationend",
-  "touchforcechange"
-];
-function patchMPEvent(event, instance) {
-  if (event.type && event.target) {
-    event.preventDefault = NOOP;
-    event.stopPropagation = NOOP;
-    event.stopImmediatePropagation = NOOP;
-    if (!hasOwn(event, "detail")) {
-      event.detail = {};
-    }
-    if (hasOwn(event, "markerId")) {
-      event.detail = typeof event.detail === "object" ? event.detail : {};
-      event.detail.markerId = event.markerId;
-    }
-    if (isPlainObject$1(event.detail) && hasOwn(event.detail, "checked") && !hasOwn(event.detail, "value")) {
-      event.detail.value = event.detail.checked;
-    }
-    if (isPlainObject$1(event.detail)) {
-      event.target = extend({}, event.target, event.detail);
-    }
-  }
-}
-function patchStopImmediatePropagation(e2, value) {
-  if (isArray(value)) {
-    const originalStop = e2.stopImmediatePropagation;
-    e2.stopImmediatePropagation = () => {
-      originalStop && originalStop.call(e2);
-      e2._stopped = true;
-    };
-    return value.map((fn) => (e3) => !e3._stopped && fn(e3));
-  } else {
-    return value;
-  }
-}
-const o = (value, key) => vOn(value, key);
-const s = (value) => stringifyStyle(value);
+const f = (source, renderItem) => vFor(source, renderItem);
 const e = (target, ...sources) => extend(target, ...sources);
-const n = (value) => normalizeClass(value);
-const p = (props) => renderProps(props);
 function createApp$1(rootComponent, rootProps = null) {
   rootComponent && (rootComponent.mpType = "app");
   return createVueApp(rootComponent, rootProps).use(plugin);
@@ -5828,8 +5677,8 @@ const $once = defineSyncApi(API_ONCE, (name, callback) => {
 const $off = defineSyncApi(API_OFF, (name, callback) => {
   if (!isArray(name))
     name = name ? [name] : [];
-  name.forEach((n2) => {
-    eventBus.off(n2, callback);
+  name.forEach((n) => {
+    eventBus.off(n, callback);
   });
 }, OffProtocol);
 const $emit = defineSyncApi(API_EMIT, (name, ...args) => {
@@ -7059,7 +6908,7 @@ function isConsoleWritable() {
 function initRuntimeSocketService() {
   const hosts = "127.0.0.1,192.168.3.77,192.168.10.14";
   const port = "8090";
-  const id = "mp-weixin_UBaegG";
+  const id = "mp-weixin_q1a-w0";
   const lazy = typeof swan !== "undefined";
   let restoreError = lazy ? () => {
   } : initOnError();
@@ -8030,8 +7879,8 @@ function del(target, key) {
 let activePinia;
 const setActivePinia = (pinia) => activePinia = pinia;
 const piniaSymbol = Symbol("pinia");
-function isPlainObject(o2) {
-  return o2 && typeof o2 === "object" && Object.prototype.toString.call(o2) === "[object Object]" && typeof o2.toJSON !== "function";
+function isPlainObject(o) {
+  return o && typeof o === "object" && Object.prototype.toString.call(o) === "[object Object]" && typeof o.toJSON !== "function";
 }
 var MutationType;
 (function(MutationType2) {
@@ -8186,8 +8035,8 @@ function shouldHydrate(obj) {
   return !isPlainObject(obj) || !obj.hasOwnProperty(skipHydrateSymbol);
 }
 const { assign } = Object;
-function isComputed(o2) {
-  return !!(isRef(o2) && o2.effect);
+function isComputed(o) {
+  return !!(isRef(o) && o.effect);
 }
 function createOptionsStore(id, options, pinia, hot) {
   const { state, actions, getters } = options;
@@ -8505,8 +8354,8 @@ function createSetupStore($id, setup, options = {}, pinia, hot, isOptionsStore) 
       // avoid warning on devtools trying to display this property
       enumerable: false
     };
-    ["_p", "_hmrPayload", "_getters", "_customProperties"].forEach((p2) => {
-      Object.defineProperty(store, p2, assign({ value: store[p2] }, nonEnumerable));
+    ["_p", "_hmrPayload", "_getters", "_customProperties"].forEach((p) => {
+      Object.defineProperty(store, p, assign({ value: store[p] }, nonEnumerable));
     });
   }
   pinia._p.forEach((extender) => {
@@ -8603,17 +8452,13 @@ exports._export_sfc = _export_sfc;
 exports.computed = computed;
 exports.createPinia = createPinia;
 exports.createSSRApp = createSSRApp;
-exports.defineComponent = defineComponent;
 exports.defineStore = defineStore;
 exports.e = e;
+exports.f = f;
 exports.index = index;
-exports.n = n;
-exports.o = o;
 exports.onMounted = onMounted;
-exports.p = p;
 exports.ref = ref;
 exports.resolveComponent = resolveComponent;
-exports.s = s;
-exports.watch = watch;
+exports.unref = unref;
 exports.wx$1 = wx$1;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/common/vendor.js.map

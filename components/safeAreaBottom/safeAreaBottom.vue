@@ -1,0 +1,4 @@
+<template>
+	<view style="height: env(safe-area-inset-bottom);">
+	</view>
+</template>
